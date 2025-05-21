@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FogoChain インフォグラフィック：業界トレンドと市場調査</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #E0F2FE; /* Very light blue */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Default max-width */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px; /* Max height */
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        h1, h2, h3 {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 700;
+        }
+        .stat-number {
+            font-size: 3rem; /* Tailwind text-5xl */
+            font-weight: 700;
+            color: #0077B6; /* Strong Blue */
+        }
+        .stat-label {
+            font-size: 1rem; /* Tailwind text-base */
+            color: #073B4C; /* Dark, desaturated blue */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Tailwind shadow-md */
+            padding: 1.5rem; /* Tailwind p-6 */
+            margin-bottom: 1.5rem; /* Tailwind mb-6 */
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+            padding-left: 2.5rem; 
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #00B4D8; /* Medium Blue */
+            border: 3px solid #E0F2FE; 
+        }
+        .timeline-line {
+            position: absolute;
+            left: 9px;
+            top: 20px;
+            bottom: -10px; /* Extend slightly below last marker if needed */
+            width: 2px;
+            background-color: #90E0EF; /* Light Blue */
+        }
+        .flowchart-step {
+            border: 2px solid #48CAE4; /* Lighter Medium Blue */
+            padding: 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            text-align: center;
+            background-color: #F0F8FF; /* AliceBlue, very light */
+        }
+        .flowchart-arrow {
+            font-size: 1.5rem; /* text-2xl */
+            color: #0077B6; /* Strong Blue */
+            margin: 0 0.5rem;
+        }
+        .section-intro-text {
+            color: #073B4C;
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75;
+            margin-bottom: 1rem;
+        }
+        .chart-title {
+            text-align: center;
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600;
+            color: #0077B6;
+            margin-bottom: 1rem;
+        }
+        .context-text {
+            color: #073B4C;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+        .llm-feature-box {
+            background-color: #F0F8FF; /* AliceBlue */
+            border: 1px solid #90E0EF; /* Light Blue */
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .llm-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .llm-input-group input[type="text"] {
+            padding: 0.75rem;
+            border: 1px solid #90E0EF;
+            border-radius: 0.375rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .llm-button {
+            background-color: #00B4D8;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+        }
+        .llm-button:hover {
+            background-color: #0096C7;
+        }
+        .llm-output-area {
+            background-color: #E0F7FA; /* Light Cyan */
+            border: 1px solid #B2EBF2; /* Cyan-ish */
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            min-height: 50px;
+            color: #073B4C;
+        }
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+            color: #0077B6;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-center" style="color: #0077B6;">FogoChain インフォグラフィック</h1>
+            <p class="text-center text-lg" style="color: #073B4C;">業界トレンドと市場調査：次世代L1ブロックチェーンの深層分析</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        
+        <section id="intro" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 text-center" style="color: #0077B6;">FogoChainへようこそ：機関投資家グレードのパフォーマンスでDeFiに革命を</h2>
+                <p class="section-intro-text">
+                    FogoChainは、高性能なレイヤー1ブロックチェーンとして登場し、リアルタイム体験を大規模に提供することで分散型金融（DeFi）に革命を起こすことを目指しています。従来の金融（TradFi）と分散型インフラ間のパフォーマンスギャップを埋めることを目的とし、その核にはアーキテクチャの革新があります。
+                </p>
+                <div class="grid md:grid-cols-2 gap-8 mt-6">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="stat-number">54,000+</div>
+                        <div class="stat-label">目標トランザクション/秒 (TPS)</div>
+                        <p class="context-text">テストネットでは既に45,000 TPSを実証。将来的には100万TPS超のアーキテクチャ。</p>
+                    </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="stat-number">&lt;40<span class="text-2xl">ms</span></div>
+                        <div class="stat-label">目標ブロックタイム</div>
+                        <p class="context-text">テストネットでは20ミリ秒未満のブロックファイナリティを達成。</p>
+                    </div>
+                </div>
+                <p class="context-text mt-4">
+                    FogoChainの核となる技術はSolana Virtual Machine (SVM) を活用し、特にJump Crypto開発の高性能クライアント「Firedancer」を純粋な形で利用。これにより、最適化された並列処理、メモリ管理、SIMD命令を通じて高いトランザクションスループットを実現します。
+                </p>
+            </div>
+        </section>
+
+        <section id="tech" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">コア技術とイノベーション</h2>
+                <p class="section-intro-text">
+                    FogoChainは、独自の技術アプローチにより、スケーラビリティと低レイテンシを実現し、機関投資家グレードの金融サービス提供を目指しています。
+                </p>
+                
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-3" style="color: #0077B6;">マルチローカルコンセンサス</h3>
+                    <p class="context-text mb-4">
+                        従来の金融市場の「フォロー・ザ・サン」取引モデルに着想を得た革新的なメカニズム。地理的に近いバリデータノード群がローカルトランザクションについて迅速に合意し、レイテンシをミリ秒単位に短縮します。グローバルコンセンサスは、ローカル合意が不可能な場合にのみフォールバックとして機能します。
+                    </p>
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="flowchart-step">ローカルトランザクション発生</div>
+                        <div class="flowchart-arrow hidden md:block">&#10140;</div>
+                        <div class="flowchart-arrow md:hidden self-center transform rotate-90">&#10140;</div>
+                        <div class="flowchart-step">近隣ノード群で<br/>ローカル合意試行</div>
+                        <div class="flowchart-arrow hidden md:block">&#10140;</div>
+                        <div class="flowchart-arrow md:hidden self-center transform rotate-90">&#10140;</div>
+                        <div class="flowchart-step">合意成功？<br/>(ミリ秒単位)</div>
+                        <div class="flowchart-arrow hidden md:block">&#10140;</div>
+                        <div class="flowchart-arrow md:hidden self-center transform rotate-90">&#10140;</div>
+                        <div class="flowchart-step">YES: 迅速処理<br/>NO: グローバル合意へ</div>
+                    </div>
+                    <p class="context-text mt-2">この設計は、オンチェーンでの機関投資家グレード金融を実現するための重要な差別化要因です。</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">厳選されたバリデータノード</h3>
+                        <p class="context-text">
+                            Solanaのオープンなモデルとは異なり、Fogoは厳選されたバリデータセットを採用。これにより高性能な運用を奨励し、バリデータレベルでの略奪的行為を防ぎ、中央集権化の度合いを高めることなくソーシャルレイヤーを通じて不正行為を罰することを可能にします。
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">Firedancerクライアントの利点</h3>
+                        <p class="context-text">
+                            Jump Cryptoによって開発されたFiredancerは、最適化された並列処理、メモリ管理、SIMD命令で知られる高性能Solana互換クライアントです。現在のバリデータクライアントよりも高いトランザクションスループットを実現します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="timeline" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">プロジェクトタイムラインと主要マイルストーン</h2>
+                <p class="section-intro-text">
+                    FogoChainは明確なロードマップに沿って開発を進めており、主要なマイルストーンを着実に達成しています。
+                </p>
+                <div class="relative">
+                    <div class="timeline-line hidden sm:block"></div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">2024年：設立</h3>
+                        <p class="text-sm text-gray-600">米国にてFogoChain設立。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">2024年12月：シードラウンド</h3>
+                        <p class="text-sm text-gray-600">550万ドルを調達。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">2025年1月21日：公式情報公開</h3>
+                        <p class="text-sm text-gray-600">公式ウェブサイトとホワイトペーパーを公開。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">2025年1月：パブリックセール</h3>
+                        <p class="text-sm text-gray-600">800万ドルを調達（評価額1億ドル）。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">現在：Devnet稼働中</h3>
+                        <p class="text-sm text-gray-600">54,000 TPS以上を達成と報告。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">2025年3月31日：テストネットローンチ</h3>
+                        <p class="text-sm text-gray-600">Q1計画通りローンチ。開発者向けに稼働中。</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <h3 class="text-lg font-semibold" style="color: #00B4D8;">2025年第2四半期（4月～6月）：メインネットローンチ予定</h3>
+                        <p class="text-sm text-gray-600">ネットワークの完全な運用展開、TGE時期と予想。</p>
+                    </div>
+                </div>
+                 <p class="context-text mt-4">「Flames Season 1」が間もなく終了すること（2025年5月19日時点で残り2週間）は、ポイント蓄積のスナップショットまたは終了がTGE/エアドロップフェーズに直接つながる可能性を示唆しています。</p>
+            </div>
+        </section>
+
+        <section id="funding" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">資金調達と支援者</h2>
+                <p class="section-intro-text">
+                    FogoChainは、強力な投資家からの支援を受け、プロジェクト開発のための十分な資金を確保しています。
+                </p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div class="text-center mb-6">
+                            <div class="stat-number text-6xl">$13.5<span class="text-4xl">M</span></div>
+                            <div class="stat-label">総調達額</div>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">主要投資家:</h3>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>CMS Holdings</li>
+                            <li>Kain Warwick (Synthetix創設者)</li>
+                            <li>Larry Cermak (The Block)</li>
+                            <li>Cobie (著名な暗号資産インフルエンサー)</li>
+                        </ul>
+                        <p class="context-text mt-2">著名な投資家の参加は、プロジェクトへの信頼性を示しています。</p>
+                    </div>
+                    <div>
+                        <h3 class="chart-title">資金調達ラウンド内訳</h3>
+                        <div class="chart-container h-64 md:h-80">
+                            <canvas id="fundingRoundsChart"></canvas>
+                        </div>
+                        <p class="context-text">シードラウンドとパブリックセール（コミュニティラウンド）を通じて資金を調達。特にパブリックセールは1億ドルの評価額で行われました。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="integrations" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">戦略的エコシステム統合</h2>
+                <p class="section-intro-text">
+                    FogoChainは、その「オンチェーンでの機関投資家グレード金融」という使命を強化するため、主要プロジェクトと深く統合しています。
+                </p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
+                        <h3 class="text-xl font-semibold mb-2 flex items-center" style="color: #00B4D8;">
+                            <span class="text-2xl mr-2">🔗</span> Pyth Network
+                        </h3>
+                        <p class="context-text">機関投資家グレードの市場データをオンチェーンで直接提供し、レイテンシと信頼性の問題を排除。Pyth NetworkのLazerはFogoChainテストネットを動かし、1ミリ秒の市場データ更新を提供します。Oracle Integrity Staking (OIS) を通じたPYTHトークンのステーキングはFlameポイント獲得に繋がります。</p>
+                    </div>
+                    <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
+                        <h3 class="text-xl font-semibold mb-2 flex items-center" style="color: #00B4D8;">
+                            <span class="text-2xl mr-2">🔄</span> Ambient Finance
+                        </h3>
+                        <p class="context-text">分散型取引所（DEX）プロトコル。Fogoの共同創設者Douglas Colkitt氏が開発したCrocodile LabsがAmbient Financeを開発し、Fogoへの展開を計画。Fogoに組み込まれたDEXを強化し、統一された取引体験を創出します。Ambient Financeでの取引や流動性提供はFlameポイント獲得の重要な活動です。</p>
+                    </div>
+                </div>
+                <p class="context-text mt-4">これらの統合は単なるパートナーシップではなく、Fogoの価値提案の基本的な構成要素であり、プロのトレーダーや金融機関をターゲットとした、よく考えられたエコシステム設計を示唆しています。</p>
+            </div>
+        </section>
+
+        <section id="llm-market-analysis" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">✨市場トレンド分析：FogoChainの未来を予測✨</h2>
+                <p class="section-intro-text">
+                    FogoChainが特定の市場トレンドにどのように適合し、影響を与えるかについて、AIによる分析と予測を生成します。関心のあるトレンドを入力してください。
+                </p>
+                <div class="llm-feature-box">
+                    <h3 class="text-xl font-semibold mb-3" style="color: #0077B6;">トレンド分析</h3>
+                    <div class="llm-input-group">
+                        <label for="trendInput" class="font-medium text-gray-700">分析したい市場トレンドを入力してください (例: DeFiの成長, 機関投資家の採用, Web3ゲームの普及):</label>
+                        <input type="text" id="trendInput" placeholder="例: DeFiの成長" class="focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <button id="analyzeTrendBtn" class="llm-button">✨トレンド分析を生成✨</button>
+                    <div id="trendAnalysisOutput" class="llm-output-area">ここに分析結果が表示されます。</div>
+                    <div id="trendLoading" class="loading-indicator">分析中...しばらくお待ちください。</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="flames-program" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">🔥 Fogo Flamesプログラム：貢献して報酬を獲得</h2>
+                 <p class="section-intro-text">
+                    「Fogo Flames」は、コミュニティエンゲージメント戦略の中核であり、早期参加を奨励し、将来の報酬（潜在的なエアドロップ）の資格を決定する可能性があります。
+                </p>
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">Flameポイントの目的</h3>
+                    <p class="context-text">コミュニティメンバーが「フレイム」を蓄積し、リーダーボードで順位を上げるプログラム。ポイントは将来的に「プロジェクトトークンに変換される」と明示されており、「今後のエアドロップの資格を決定する可能性がある」とされています。真の影響力を持つ貢献者を報酬することが目的です。</p>
+                </div>
+
+                <div>
+                    <h3 class="chart-title">Flameポイント獲得方法</h3>
+                    <div class="chart-container h-96 md:h-[450px]">
+                        <canvas id="flamePointsChart"></canvas>
+                    </div>
+                    <p class="context-text">Flameポイントは、FogoChainのコア技術やパートナーシップと深く統合された活動を通じて獲得できます。これには、Pyth Networkでのステーキング、Ambient Financeでの取引や流動性提供、DiscordやTwitterでのエンゲージメント、そしてLatency Invadersゲームへの参加が含まれます。進捗は公式リーダーボードで確認可能です。</p>
+                    <p class="context-text mt-2">FogoChainはプログラムの整合性維持に努めており、「不自然な活動」に対して措置を講じ、数千のアカウントをリーダーボードから削除しています。「Flames Season 1」は2025年5月19日時点で残り2週間とアナウンスされていました。</p>
+                </div>
+
+                <div class="llm-feature-box">
+                    <h3 class="text-xl font-semibold mb-3" style="color: #0077B6;">✨Flameポイント戦略提案✨</h3>
+                    <p class="context-text mb-4">あなたが関心のあるFlameポイント獲得活動を選択してください。AIが最適な戦略を提案します。</p>
+                    <div class="llm-input-group">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="pythStaking" class="form-checkbox text-blue-600">
+                            <span class="ml-2 text-gray-700">Pyth Network OIS ステーキング</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="ambientFinance" class="form-checkbox text-blue-600">
+                            <span class="ml-2 text-gray-700">Ambient Finance 取引/LP提供</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="discordTwitter" class="form-checkbox text-blue-600">
+                            <span class="ml-2 text-gray-700">Discord/Twitter エンゲージメント</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="latencyInvaders" class="form-checkbox text-blue-600">
+                            <span class="ml-2 text-gray-700">Latency Invaders ゲーム参加</span>
+                        </label>
+                    </div>
+                    <button id="suggestStrategyBtn" class="llm-button">✨最適な戦略を提案✨</button>
+                    <div id="flameStrategyOutput" class="llm-output-area">ここに戦略提案が表示されます。</div>
+                    <div id="strategyLoading" class="loading-indicator">戦略生成中...しばらくお待ちください。</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tge-airdrop" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">TGEへの道とエアドロップの可能性</h2>
+                <p class="section-intro-text">
+                    FogoChainのネイティブトークンのトークン生成イベント（TGE）はメインネットローンチと密接に関連しており、プロジェクト開発の重要なマイルストーンです。
+                </p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">予想されるTGE時期</h3>
+                        <p class="text-3xl font-bold" style="color: #FF8C00;">2025年 第2四半期</p>
+                        <p class="context-text">(4月～6月) メインネットローンチと同時期か直後と予想されます。2025年5月19日時点でメインネットは「間もなく」と説明されています。</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">エアドロップの状況</h3>
+                        <p class="context-text">Fogo Flamesプログラムは「早期貢献者向けのエアドロップが間もなく行われることを強く示唆」していますが、公式な確定情報や詳細は未発表です。Flameポイントが資格を決定する主要因となる見込みです。</p>
+                    </div>
+                </div>
+                <div class="mt-6">
+                     <h3 class="text-xl font-semibold mb-2" style="color: #0077B6;">トークノミクスについて（情報限定）</h3>
+                     <p class="context-text">総供給量、割り当て、ベスティングスケジュールなどの詳細なトークノミクスは、現時点では広範に開示されていません。「Fogo Flames」ポイントがプロジェクトトークンに変換されるとされていますが、変換率は不明です。公式発表を待つ必要があります。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #0077B6;">主要な考慮事項とリスク</h2>
+                <p class="section-intro-text">
+                    新興の暗号資産プロジェクト、特にエアドロップを提供するプロジェクトへの関与には、固有のリスクが伴います。
+                </p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #FF8C00;">一般的な暗号資産エアドロップのリスク</h3>
+                        <ul class="list-disc list-inside space-y-1 context-text">
+                            <li><span class="font-semibold">詐欺への警戒：</span>フィッシングリンク、偽トークン、秘密鍵の要求に注意。正当なエアドロップはこれらを要求しません。</li>
+                            <li><span class="font-semibold">市場のボラティリティ：</span>暗号資産の価値は急激に変動する可能性があります。</li>
+                            <li><span class="font-semibold">法的保護の欠如：</span>従来の金融取引と異なり、法的保護が通常なく、多くの場合取り消し不可能です。</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2" style="color: #FF8C00;">FogoChain固有の考慮事項</h3>
+                        <ul class="list-disc list-inside space-y-1 context-text">
+                            <li><span class="font-semibold">規制遵守：</span>機関投資家向け設計は複雑な規制・コンプライアンス課題を伴います。</li>
+                            <li><span class="font-semibold">データ管理の複雑さ：</span>高いスループットは膨大なトランザクションデータを生成し、管理・報告を困難にします。</li>
+                            <li><span class="font-semibold">公式情報源の重要性：</span>TGE、エアドロップ、トークノミクスに関する最新情報は公式チャネル（ウェブサイト、Twitter、Discord）のみを参照してください。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="conclusion" class="mb-12">
+            <div class="card text-center">
+                <h2 class="text-2xl font-bold mb-4" style="color: #0077B6;">結論：未来はFogoと共に</h2>
+                <p class="section-intro-text">
+                    FogoChainは、Firedancerクライアントやマルチローカルコンセンサスといった革新的技術に支えられ、機関投資家グレードの分散型金融という明確なビジョンを持つ強力なレイヤー1ブロックチェーンとして位置づけられています。「Fogo Flames」プログラムは、エコシステムへの積極的なエンゲージメントを通じて早期貢献者に報酬を与える戦略的なインセンティブです。
+                </p>
+                <p class="context-text">
+                    メインネットローンチが2025年第2四半期に予定されており、トークン配布が間近に迫っている可能性が高いです。参加者は引き続きFlameポイントを蓄積しつつ、潜在的な詐欺に警戒し、FogoChainの公式コミュニケーションチャネルからの情報にのみ依拠することが不可欠です。FogoChainの成功は、高性能の約束を果たし、規制環境を乗り越え、機関投資家の採用を引き付ける能力にかかっています。
+                </p>
+                <a href="https://www.fogo.io/" target="_blank" rel="noopener noreferrer" class="mt-6 inline-block bg-[#00B4D8] hover:bg-[#0096C7] text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-300">
+                    FogoChain公式サイトへ
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-6">
+        <p>&copy; 2025 FogoChainインフォグラフィック. 全ての権利は留保されています。</p>
+        <p class="text-sm mt-1">この情報は調査に基づくものであり、投資助言ではありません。</p>
+    </footer>
+
+    <script>
+        function processLabel(label, maxLength = 16) {
+            if (label.length <= maxLength) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + word).length > maxLength && currentLine.length > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            }
+            lines.push(currentLine.trim());
+            return lines;
+        }
+        
+        const tooltipTitleCallback = function(tooltipItems) {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            } else {
+                return label;
+            }
+        };
+
+        const fundingData = {
+            labels: [processLabel('シードラウンド'), processLabel('パブリックセール')],
+            datasets: [{
+                label: '資金調達額 (百万ドル)',
+                data: [5.5, 8.0],
+                backgroundColor: [
+                    '#48CAE4', // Lighter Medium Blue
+                    '#00B4D8'  // Medium Blue
+                ],
+                borderColor: [
+                    '#FFFFFF',
+                    '#FFFFFF'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        new Chart(document.getElementById('fundingRoundsChart'), {
+            type: 'doughnut',
+            data: fundingData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#073B4C' }
+                    },
+                    tooltip: {
+                        callbacks: { title: tooltipTitleCallback }
+                    }
+                }
+            }
+        });
+
+        const flamePointsData = {
+            labels: [
+                processLabel('Pyth Network OIS ステーキング'), 
+                processLabel('Ambient Finance 取引/LP提供'),
+                processLabel('Fogo Discord エンゲージメント'),
+                processLabel('Fogo Twitter エンゲージメント'),
+                processLabel('Latency Invaders ゲーム参加')
+            ],
+            datasets: [{
+                label: 'Flameポイント獲得活動 (相対的重要性/機会)',
+                data: [85, 90, 70, 65, 50], // Hypothetical values for illustration
+                backgroundColor: '#48CAE4', // Lighter Medium Blue
+                borderColor: '#00B4D8', // Medium Blue
+                borderWidth: 1,
+                borderRadius: 5,
+                barPercentage: 0.7,
+                categoryPercentage: 0.8
+            }]
+        };
+
+        new Chart(document.getElementById('flamePointsChart'), {
+            type: 'bar',
+            data: flamePointsData,
+            options: {
+                indexAxis: 'y', // Horizontal bar chart
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: '#D1D5DB' },
+                        ticks: { color: '#073B4C' }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#073B4C', font: { size: 11 } }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false 
+                    },
+                    tooltip: {
+                        callbacks: { title: tooltipTitleCallback }
+                    }
+                }
+            }
+        });
+
+        // Gemini API Integration
+        const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+
+        async function callGeminiAPI(prompt, outputElementId, loadingElementId) {
+            const outputElement = document.getElementById(outputElementId);
+            const loadingElement = document.getElementById(loadingElementId);
+            outputElement.innerHTML = ''; // Clear previous output
+            loadingElement.style.display = 'block'; // Show loading indicator
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    outputElement.innerHTML = text.replace(/\n/g, '<br>'); // Display response, handle newlines
+                } else {
+                    outputElement.innerHTML = 'エラー: 応答が予期しない形式です。';
+                    console.error('Unexpected API response structure:', result);
+                }
+            } catch (error) {
+                outputElement.innerHTML = 'エラー: API呼び出し中に問題が発生しました。';
+                console.error('Error calling Gemini API:', error);
+            } finally {
+                loadingElement.style.display = 'none'; // Hide loading indicator
+            }
+        }
+
+        // Market Trend Analysis Feature
+        document.getElementById('analyzeTrendBtn').addEventListener('click', () => {
+            const trend = document.getElementById('trendInput').value.trim();
+            if (trend) {
+                const prompt = `FogoChainが「${trend}」にどのように影響し、そのトレンド内でどのような役割を果たすかについて、簡潔な市場分析と予測を提供してください。FogoChainの高性能L1ブロックチェーンとしての特性、Pyth NetworkやAmbient Financeとの統合、そして機関投資家グレードのDeFiを目指すという目標を考慮に入れてください。`;
+                callGeminiAPI(prompt, 'trendAnalysisOutput', 'trendLoading');
+            } else {
+                document.getElementById('trendAnalysisOutput').innerHTML = '分析したい市場トレンドを入力してください。';
+            }
+        });
+
+        // Flame Points Strategy Suggester Feature
+        document.getElementById('suggestStrategyBtn').addEventListener('click', () => {
+            const selectedActivities = [];
+            if (document.getElementById('pythStaking').checked) selectedActivities.push('Pyth Network OIS ステーキング');
+            if (document.getElementById('ambientFinance').checked) selectedActivities.push('Ambient Finance 取引/LP提供');
+            if (document.getElementById('discordTwitter').checked) selectedActivities.push('Discord/Twitter エンゲージメント');
+            if (document.getElementById('latencyInvaders').checked) selectedActivities.push('Latency Invaders ゲーム参加');
+
+            let prompt;
+            if (selectedActivities.length > 0) {
+                prompt = `Fogo Flamesプログラムにおいて、ユーザーが「${selectedActivities.join('と')}」に焦点を当てている場合、Flameポイントを最大化するための具体的な戦略を提案してください。各活動の重要性と、FogoChainエコシステムへの貢献という観点から説明してください。`;
+            } else {
+                prompt = `Fogo Flamesプログラムにおいて、Flameポイントを最大化するための一般的な戦略を提案してください。各活動の重要性と、FogoChainエコシステムへの貢献という観点から説明してください。`;
+            }
+            callGeminiAPI(prompt, 'flameStrategyOutput', 'strategyLoading');
+        });
+    </script>
+</body>
+</html>
